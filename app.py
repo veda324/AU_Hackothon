@@ -5,52 +5,58 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 
-st.title("🎵 Spotify Song Clustering App")
+st.title("Spotify Song Clustering App")
 
-st.write("This app clusters Spotify songs based on audio features using KMeans.")
+st.write("Upload Spotify Dataset CSV file")
 
-# Load dataset
-df = pd.read_csv("SpotifyFeatures.csv")
+# Upload dataset
+uploaded_file = st.file_uploader("Upload SpotifyFeatures.csv", type=["csv"])
 
-st.subheader("Dataset Preview")
-st.dataframe(df.head())
+if uploaded_file is not None:
 
-# Select features
-features = df[['danceability','energy','tempo','loudness','valence']]
+    df = pd.read_csv(uploaded_file)
 
-# Handle missing values
-features = features.dropna()
+    st.subheader("Dataset Preview")
+    st.write(df.head())
 
-# Normalize data
-scaler = StandardScaler()
-scaled_features = scaler.fit_transform(features)
+    # Select features
+    features = df[['danceability','energy','tempo','loudness','valence']]
 
-# Cluster selection
-k = st.slider("Select Number of Clusters", 2, 10, 4)
+    # Remove missing values
+    features = features.dropna()
 
-# Apply KMeans
-kmeans = KMeans(n_clusters=k, random_state=42)
-clusters = kmeans.fit_predict(scaled_features)
+    # Normalize data
+    scaler = StandardScaler()
+    scaled_features = scaler.fit_transform(features)
 
-df = df.loc[features.index]
-df['cluster'] = clusters
+    # Select number of clusters
+    k = st.slider("Select number of clusters", 2, 10, 4)
 
-st.subheader("Clustered Data")
-st.dataframe(df[['danceability','energy','tempo','loudness','valence','cluster']].head())
+    # KMeans clustering
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    clusters = kmeans.fit_predict(scaled_features)
 
-# PCA for visualization
-pca = PCA(n_components=2)
-pca_data = pca.fit_transform(scaled_features)
+    df = df.loc[features.index]
+    df['cluster'] = clusters
 
-fig, ax = plt.subplots()
-scatter = ax.scatter(pca_data[:,0], pca_data[:,1], c=clusters)
-ax.set_title("Spotify Song Clusters")
-ax.set_xlabel("PCA1")
-ax.set_ylabel("PCA2")
+    st.subheader("Clustered Data")
+    st.write(df.head())
 
-st.pyplot(fig)
+    # PCA Visualization
+    pca = PCA(n_components=2)
+    pca_data = pca.fit_transform(scaled_features)
 
-# Cluster Insights
-st.subheader("Cluster Insights")
-cluster_mean = df.groupby('cluster')[['danceability','energy','tempo','loudness','valence']].mean()
-st.dataframe(cluster_mean)
+    fig, ax = plt.subplots()
+    scatter = ax.scatter(pca_data[:,0], pca_data[:,1], c=clusters)
+    ax.set_title("Spotify Song Clusters")
+    ax.set_xlabel("PCA1")
+    ax.set_ylabel("PCA2")
+
+    st.pyplot(fig)
+
+    # Cluster insights
+    st.subheader("Cluster Insights")
+    st.write(df.groupby('cluster')[['danceability','energy','tempo','loudness','valence']].mean())
+
+else:
+    st.warning("Please upload the SpotifyFeatures.csv file to continue.")
