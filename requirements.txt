@@ -1,24 +1,5 @@
-# Spotify Music Clustering
-
-This project clusters Spotify songs based on audio features using Machine Learning.
-
-## Algorithm Used
-KMeans Clustering
-
-## Features Used
-- Danceability
-- Energy
-- Tempo
-- Loudness
-- Valence
-
-## Techniques
-- Data Normalization
-- KMeans Clustering
-- PCA for visualization
-
-## Libraries
-- pandas
-- numpy
-- scikit-learn
-- matplotlib
+streamlit
+pandas
+numpy
+matplotlib
+scikit-learn
